@@ -1,12 +1,15 @@
 from PIL import Image
 import torch
 import numpy as np
+from scipy import stats
+
 import math
 import einops
 import plotly.graph_objects as go
 import plotly.express as px
 
 import matplotlib.pyplot as plt
+
 
 
 def render_array(arr, scale: int = 1, raw_array=False):
@@ -65,7 +68,6 @@ def str_arr_add(*args):
         res = np.core.defchararray.add(res, item)
     return res
 
-testing = np.random.randint(0, 10, 4).tolist()
 
 def heatmap(arr, perm_0=False, perm_1=False, dim_names = ('row', 'col'), info_0=None, info_1=None, include_idx=(True, True), title=False):
     '''
@@ -137,7 +139,6 @@ def heatmap(arr, perm_0=False, perm_1=False, dim_names = ('row', 'col'), info_0=
 
     return fig
 
-from scipy import stats
 
 def qq_plot(x, dist='norm', sparams=(), hovertext=None):
     x = x.squeeze()

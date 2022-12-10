@@ -1,5 +1,4 @@
 import torch
-import umap
 import sys
 import traceback
 import numpy as np
@@ -20,13 +19,6 @@ def is_iterable(x):
         return True
     except:
         return False
-
-def get_umap(x, n_components=1):
-    '''
-    x : (n_samples, n_features)
-    '''
-    reducer = umap.UMAP(n_components=n_components)
-    return reducer.fit_transform(x)
 
 def opt(x):
     # print elements of dir(x) that don't start with _
