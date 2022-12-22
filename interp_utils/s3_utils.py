@@ -61,7 +61,7 @@ def upload_figs(figs, fname, bucket='plotly-figs', fig_info=[], public=True):
         fig_info = ['' for i in range(len(figs))]
     assert len(figs) == len(fig_info)
 
-    assert fname.split('.')[-1] == 'html', 'fname must end in .html'
+    # assert fname.split('.')[-1] == 'html', 'fname must end in .html'
 
     res_html = html_head
     for fig, info in zip(figs, fig_info):

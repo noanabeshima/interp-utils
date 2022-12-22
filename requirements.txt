@@ -8,3 +8,4 @@ matplotlib == 3.6.2
 boto3 == 1.26.26
 tsp_solver == 0.1
 scipy == 1.9.0
+tqdm == 4.64.1

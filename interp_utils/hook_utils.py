@@ -1,5 +1,11 @@
 from typing import List, Callable
 
+
+# hooks have function signature
+# def hook_fn(module, input, output)
+# where input and output are the input and output of the module
+
+
 def register_hook(module, hook_fn: Callable):
     if not hasattr(module, 'cache'):
         module.cache = {}
@@ -8,7 +14,7 @@ def register_hook(module, hook_fn: Callable):
     if hook_fn.__name__ in module.hooks:
         print('Warning: hook_fn already registered:', module.__class__.__name__, hook_fn.__name__)
         return
-    removable_handle = module.register_forward_hook(lambda module, input, output: hook_fn(input, output, module.cache))
+    removable_handle = module.register_forward_hook(lambda module, input, output: hook_fn(module, input, output))
     module.hooks[hook_fn.__name__] = removable_handle
     return removable_handle
 
