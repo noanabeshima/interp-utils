@@ -81,6 +81,7 @@ def asee(t: torch.Tensor):
         # print('line: '+str(lineno))
     print()
 
+
 def batched_bincount(x, dim, max_value):
     # From Guillaume Leclerc: https://discuss.pytorch.org/t/batched-bincount/72819/3
     target = torch.zeros(x.shape[0], max_value, dtype=x.dtype, device=x.device)
@@ -91,20 +92,20 @@ def batched_bincount(x, dim, max_value):
 
 class TensorHistogramObserver:
     def __init__(self, min, max, bin_width, tensor_shape):
-        '''
+        """
         Useful for storing bin counts for multiple histograms in parallel
         E.G. one for each (layer, neuron) pair, in which case tensor_shape=(n_layers, n_neurons)
         and self.update would be called with tensors of shape (n_layers, n_neurons, n_samples).
-        '''
-        
+        """
+
         self.min = min
         self.max = max
         self.bin_width = bin_width
         self.tensor_shape = tensor_shape
-        
-        self.boundaries = torch.arange(self.min, self.max+bin_width, bin_width)
-        self.counts = torch.zeros(*tensor_shape, len(self.boundaries)-1).int()
-    
+
+        self.boundaries = torch.arange(self.min, self.max + bin_width, bin_width)
+        self.counts = torch.zeros(*tensor_shape, len(self.boundaries) - 1).int()
+
     def update(self, obs):
         assert obs.shape[:-1] == self.tensor_shape
         obs = obs.detach().cpu()
@@ -112,5 +113,14 @@ class TensorHistogramObserver:
         # flatten all but last dimension
         obs_view = obs.view(-1, obs.shape[-1])
         # bucket ids with shape (product(obs.shape[:-1]), obs.shape[-1])
-        flattened_bucket_ids = torch.bucketize(obs_view.clamp(self.min, self.max-self.bin_width*1e-4), self.boundaries, right=True)-1
-        self.counts += batched_bincount(flattened_bucket_ids, dim=-1, max_value=len(self.boundaries)-1).view(*obs.shape[:-1], -1)
+        flattened_bucket_ids = (
+            torch.bucketize(
+                obs_view.clamp(self.min, self.max - self.bin_width * 1e-4),
+                self.boundaries,
+                right=True,
+            )
+            - 1
+        )
+        self.counts += batched_bincount(
+            flattened_bucket_ids, dim=-1, max_value=len(self.boundaries) - 1
+        ).view(*obs.shape[:-1], -1)

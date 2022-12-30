@@ -10,8 +10,10 @@ import plotly.express as px
 
 import matplotlib.pyplot as plt
 
+
 def is_tensor(x):
     return isinstance(x, torch.Tensor) or isinstance(x, torch.nn.parameter.Parameter)
+
 
 def tensor_to_numpy(x):
     # if x is a tensor, convert to numpy array
@@ -20,6 +22,7 @@ def tensor_to_numpy(x):
     if isinstance(x, torch.nn.parameter.Parameter):
         x = x.detach().cpu().numpy()
     return x
+
 
 def render_array(arr, scale: int = 1, raw_array=False):
     arr = tensor_to_numpy(arr)
@@ -88,7 +91,7 @@ def heatmap(
     mask_0=None,
     mask_1=None,
     sort_0=None,
-    sort_1=None
+    sort_1=None,
 ):
     """
     arr: 2d numpy or torch array to render
@@ -98,9 +101,12 @@ def heatmap(
     sort_0, sort_1: 1d arrays of indices to sort the rows and columns of the heatmap by
     """
 
-
-    assert not(perm_0 is not None and sort_0 is not None), "Cannot provide both perm_0 and sort_0"
-    assert not(perm_1 is not None and sort_1 is not None), "Cannot provide both perm_1 and sort_1"
+    assert not (
+        perm_0 is not None and sort_0 is not None
+    ), "Cannot provide both perm_0 and sort_0"
+    assert not (
+        perm_1 is not None and sort_1 is not None
+    ), "Cannot provide both perm_1 and sort_1"
 
     # convert arr to numpy array
     arr = tensor_to_numpy(arr)
@@ -112,7 +118,7 @@ def heatmap(
             title = f"{arr.shape}"
         else:
             title = f"({dim_names[0]}, {dim_names[1]})"
-    
+
     # get permutations from sort arrays
     if sort_0 is not None:
         assert len(sort_0.shape) == 1
@@ -120,12 +126,14 @@ def heatmap(
     if sort_1 is not None:
         assert len(sort_1.shape) == 1
         perm_1 = torch.tensor(tensor_to_numpy(sort_1)).topk(k=len(sort_1)).indices
-    
+
     # if permutations are not provided, use the identity permutation
     perm_0 = np.arange(arr.shape[0]) if perm_0 is None else tensor_to_numpy(perm_0)
     perm_1 = np.arange(arr.shape[1]) if perm_1 is None else tensor_to_numpy(perm_1)
 
-    def construct_dim_info(dim_info: dict, dim_name: str, dim_len, perm, mask=None, include_idx=False):
+    def construct_dim_info(
+        dim_info: dict, dim_name: str, dim_len, perm, mask=None, include_idx=False
+    ):
         dim_info = {} if dim_info is None else dim_info
 
         if include_idx is True:
@@ -139,12 +147,12 @@ def heatmap(
                     dim_info[k] = np.array(v)
 
         dim_info = {k: v[perm] for k, v in dim_info.items()}
-        
+
         if mask is not None:
             mask = tensor_to_numpy(mask)[perm]
             for k, v in dim_info.items():
                 dim_info[k] = v[mask]
-    
+
         dim_info = str_arr_add(
             *[str_arr_add(k + ": ", v, "<br>") for k, v in dim_info.items()]
         )
@@ -155,18 +163,22 @@ def heatmap(
     hovertemplate = ""
     if info_0 is not None or include_idx[0]:
         hovertemplate += "%{y}"
-        info_0 = construct_dim_info(info_0, dim_names[0], arr.shape[0], perm_0, mask_0, include_idx[0])
+        info_0 = construct_dim_info(
+            info_0, dim_names[0], arr.shape[0], perm_0, mask_0, include_idx[0]
+        )
     if info_1 is not None or include_idx[1]:
         hovertemplate += "%{x}"
-        info_1 = construct_dim_info(info_1, dim_names[1], arr.shape[1], perm_1, mask_1, include_idx[1])
+        info_1 = construct_dim_info(
+            info_1, dim_names[1], arr.shape[1], perm_1, mask_1, include_idx[1]
+        )
     hovertemplate += "val: %{z:.2f}<extra></extra>"
 
     # apply masks and permutations
-    arr = arr[perm_0][:,perm_1]
+    arr = arr[perm_0][:, perm_1]
     if mask_0 is not None:
         arr = arr[mask_0[perm_0]]
     if mask_1 is not None:
-        arr = arr[:,mask_1[perm_1]]
+        arr = arr[:, mask_1[perm_1]]
 
     # Create the plotly.graph_objects figure
     layout = go.Layout(yaxis=dict(autorange="reversed"))
@@ -258,4 +270,3 @@ def plthist(x, *args, **kwargs):
 def hist(x, *args, **kwargs):
     x = tensor_to_numpy(x)
     return px.histogram(x, *args, **kwargs)
-
