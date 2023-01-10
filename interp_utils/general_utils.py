@@ -66,7 +66,7 @@ def asee(t: torch.Tensor):
     # short for array-see, renders array as well as shape
     stack = traceback.extract_stack()
     filename, lineno, function_name, code = stack[-2]
-    code = code.replace("see(", "")[:-1]
+    code = code.replace("asee(", "")[:-1]
     print("> " + code, end="")
     if isinstance(t, torch.Tensor):
         print(": " + str(tuple(t.shape)))
