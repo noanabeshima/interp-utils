@@ -14,7 +14,7 @@ from .general_utils import (
     get_scheduler,
     is_iterable,
     opt,
-    reload_module_hack,
+    reload_module,
     see,
     asee,
     TensorHistogramObserver,
