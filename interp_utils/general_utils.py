@@ -30,10 +30,10 @@ def opt(x):
         print(item)
 
 
-def reload_module_hack(module_name: Union[str, List[str]]):
+def reload_module(module_name: Union[str, List[str]]):
     if isinstance(module_name, list):
         for m in module_name:
-            reload_module_hack(m)
+            reload_module(m)
         return
     else:
         assert isinstance(module_name, str)

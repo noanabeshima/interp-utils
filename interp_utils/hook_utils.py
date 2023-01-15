@@ -35,16 +35,18 @@ def clear_cache(module):
         clear_cache(child)
 
 
-def remove_hooks(module, quiet=False):
+def remove_hooks(module, quiet=False, wipe_cache=True):
+    # Recursively remove hooks from a module and its children
     if hasattr(module, "hooks"):
         for hook_name, removable_handle in module.hooks.items():
             if quiet is False:
                 print("Removing hook: ", module.__class__.__name__, hook_name)
             removable_handle.remove()
         module.hooks = {}
-    clear_cache(module)
+    if wipe_cache is True:
+        clear_cache(module)
     for child in module.children():
-        remove_hooks(child, quiet=quiet)
+        remove_hooks(child, quiet=quiet, wipe_cache=False)
 
 
 def caching_hook(module, input, output):
