@@ -8,7 +8,7 @@ def register_hook(module, hook_fn: Callable):
         module.hooks = {}
     if hook_fn.__name__ in module.hooks:
         print(
-            "Warning: hook_fn already registered:",
+            "hook_fn already registered!:",
             module.__class__.__name__,
             hook_fn.__name__,
         )
@@ -19,12 +19,38 @@ def register_hook(module, hook_fn: Callable):
     module.hooks[hook_fn.__name__] = removable_handle
     return removable_handle
 
+def register_pre_hook(module, hook_fn: Callable):
+    if not hasattr(module, "cache"):
+        module.cache = {}
+    if not hasattr(module, "hooks"):
+        module.hooks = {}
+    if hook_fn.__name__ in module.hooks:
+        print(
+            "hook_fn already registered!:",
+            module.__class__.__name__,
+            hook_fn.__name__,
+        )
+        return
+    removable_handle = module.register_forward_pre_hook(
+        lambda module, input: hook_fn(module, input)
+    )
+    module.hooks[hook_fn.__name__] = removable_handle
+    return removable_handle
+
 
 def register_hooks(module, hook_fns=List[Callable]):
     removable_handles = []
     for hook_fn in hook_fns:
         removable_handles.append(register_hook(module, hook_fn))
+    return removable_handles
 
+
+def register_pre_hooks(module, hook_fns=List[Callable]):
+    removable_handles = []
+    for hook_fn in hook_fns:
+        removable_handles.append(register_pre_hook(module, hook_fn))
+    return removable_handles
+    
 
 def clear_cache(module):
     if hasattr(module, "cache"):
@@ -50,5 +76,5 @@ def remove_hooks(module, quiet=False, wipe_cache=True):
 
 
 def caching_hook(module, input, output):
-    module.cache["input"] = input[0]
+    module.cache["input"] = input
     module.cache["output"] = output
