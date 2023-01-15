@@ -45,3 +45,8 @@ def remove_hooks(module, quiet=False):
     clear_cache(module)
     for child in module.children():
         remove_hooks(child, quiet=quiet)
+
+
+def caching_hook(module, input, output):
+    module.cache["input"] = input[0]
+    module.cache["output"] = output
