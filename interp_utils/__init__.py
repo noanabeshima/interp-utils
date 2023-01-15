@@ -1,4 +1,4 @@
-from .hook_utils import register_hook, register_hooks, remove_hooks, clear_cache, caching_hook
+from .hook_utils import register_hook, register_hooks, remove_hooks, clear_cache, caching_hook, register_pre_hook, register_pre_hooks
 from .rendering import (
     render_array,
     render_array_w_sign,
